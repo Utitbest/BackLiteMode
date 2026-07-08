@@ -66,7 +66,6 @@ export function super_Admin(req, res, next) {
         address,
         password: hashedPassword,
         role: "SUPER_ADMIN_1",
-        site: "not_applicable",
         siteStatus: "not_applicable",
         emailVerificationCode: code,
         emailVerificationExpires: Date.now() + 15 * 60 * 1000,
