@@ -1,0 +1,19 @@
+# Node modules (both root and frontend/backend)
+/node_modules
+
+# Build outputs
+*.log
+/.env*
+.env*
+.env
+# Environment files
+
+
+# OS-specific junk
+.DS_Store
+Thumbs.db
+
+# IDE/editor files
+.vscode/
+.idea/
+*.swp
