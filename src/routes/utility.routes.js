@@ -8,7 +8,8 @@ import {
   recordReading,
   getDashboardStats,
   getTenantsUtilitySummary, 
-  getTenantUtilityHistory
+  getTenantUtilityHistory,
+  editReading
 } from "../controllers/meter.controller.js";
 import { generateInvoice } from "../controllers/invoice.controller.js";
 const router = express.Router();
@@ -24,5 +25,6 @@ router.get("/meters/:id", getMeterById);
 router.get("/tenants", getTenantsUtilitySummary);
 router.get("/tenants/:tenantId", getTenantUtilityHistory);
 router.post("/meters/:id/readings", recordReading);
+router.patch("/meters/:id/readings/:readingId", editReading);
 
 export default router;

@@ -275,3 +275,67 @@ export function getTenantUtilityHistory(req, res, next) {
     })
     .catch(next);
 }
+export function editReading(req, res, next) {
+  const { readingDate, value, comment } = req.body;
+
+  Reading.findOne({ _id: req.params.readingId, meter: req.params.id })
+    .then((reading) => {
+      if (!reading) {
+        const error = new Error("Reading not found");
+        error.statusCode = 404;
+        throw error;
+      }
+
+      return Reading.findOne({ meter: req.params.id }).sort({ readingDate: -1 }).then((latest) => {
+        if (!latest || latest._id.toString() !== reading._id.toString()) {
+          const error = new Error(
+            "Only the most recent reading can be edited. Editing an older reading would affect every reading after it."
+          );
+          error.statusCode = 400;
+          throw error;
+        }
+        return reading;
+      });
+    })
+    .then((reading) => {
+      const numericValue = Number(value);
+      const consumption = numericValue - reading.previousValue;
+
+      if (consumption < 0) {
+        const error = new Error(
+          `New reading (${numericValue}) can't be lower than the previous reading (${reading.previousValue})`
+        );
+        error.statusCode = 400;
+        throw error;
+      }
+
+      // Recompute using the SAME rate/area that was originally applied — not the current tariff,
+      // so editing a typo doesn't accidentally reprice the bill against today's rates
+      const amount =
+        reading.spaceAreaApplied != null
+          ? consumption * reading.rateApplied * reading.spaceAreaApplied
+          : consumption * reading.rateApplied;
+
+      reading.value = numericValue;
+      reading.consumption = consumption;
+      reading.amount = amount;
+      if (readingDate) reading.readingDate = readingDate;
+      if (comment !== undefined) reading.comment = comment;
+
+      return reading.save();
+    })
+    .then((reading) => {
+      if (!reading.expense) return reading;
+
+      return Expense.findById(reading.expense).then((expense) => {
+        if (expense) {
+          expense.amount = reading.amount;
+          expense.date = reading.readingDate;
+          return expense.save().then(() => reading);
+        }
+        return reading;
+      });
+    })
+    .then((reading) => res.status(200).json({ success: true, data: reading }))
+    .catch(next);
+}
