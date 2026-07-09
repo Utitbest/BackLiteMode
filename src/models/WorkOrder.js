@@ -21,6 +21,8 @@ const workOrderSchema = new mongoose.Schema(
     priority: { type: String, enum: PRIORITIES, default: "medium" },
     status: { type: String, enum: STATUSES, default: "open" },
     location: { type: String, trim: true },
+    property: { type: mongoose.Schema.Types.ObjectId, ref: "Property", default: null },
+    asset: { type: mongoose.Schema.Types.ObjectId, ref: "Asset", default: null },
     dueDate: { type: Date },
 
     assignedTo: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null },

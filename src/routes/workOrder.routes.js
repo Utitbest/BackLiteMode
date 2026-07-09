@@ -7,14 +7,15 @@ import {
   updateStatus,
   submitFeedback,
   getAssignableUsers,
+  updateActualCost
 } from "../controllers/workOrder.controller.js";
-
 const router = express.Router();
 
 router.use(protect); // every role can reach these — scoping happens inside the controller, not by role gate
 
 router.get("/", getWorkOrders);
 router.post("/", createWorkOrder);
+router.patch("/:id/actual-cost", updateActualCost);
 router.get("/assignable-users", getAssignableUsers); // must stay above /:id
 router.get("/:id", getWorkOrderById);
 router.patch("/:id/status", updateStatus);

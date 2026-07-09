@@ -8,10 +8,11 @@ import {
   forgotPassword,
   resetPassword,
   getMe,
-  logout
+  logout,
+  updateMe,
+  changePassword
 } from "../controllers/auth.controller.js";
 import { protect } from "../middleware/auth.middleware.js";
-
 
 const router = express.Router();
 router.post("/super_login", super_Admin)
@@ -23,5 +24,7 @@ router.post("/verify-email", verifyEmail);
 router.post("/resend-code", resendCode);
 router.post("/forgot-password", forgotPassword);
 router.post("/reset-password", resetPassword);
+router.patch("/me", protect, updateMe);
+router.patch("/change-password", protect, changePassword);
 
 export default router;

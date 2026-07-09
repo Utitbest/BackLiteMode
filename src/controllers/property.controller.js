@@ -4,7 +4,10 @@ const MANAGER_ROLES = ["SUPER_ADMIN_1", "SUPER_ADMIN_2", "OPERATIONS_MANAGER", "
 const SUPER_ADMIN_ROLES = ["SUPER_ADMIN_1", "SUPER_ADMIN_2"];
 
 export function getProperties(req, res, next) {
-  const filter = SUPER_ADMIN_ROLES.includes(req.user.role) ? {} : { site: req.user.site };
+  const isSuperAdmin = SUPER_ADMIN_ROLES.includes(req.user.role);
+  const filter = isSuperAdmin
+    ? (req.query.siteId ? { site: req.query.siteId } : {})
+    : { site: req.user.site };
 
   Property.find(filter)
     .populate("site", "name")

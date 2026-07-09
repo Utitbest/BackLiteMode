@@ -334,3 +334,51 @@ export function logout(req, res, next) {
     next(err);
   }
 }
+export function updateMe(req, res, next) {
+  const { fullName, phone, address } = req.body;
+
+  User.findByIdAndUpdate(
+    req.user._id,
+    { fullName, phone, address },
+    { new: true, runValidators: true }
+  )
+    .then((user) => {
+      res.status(200).json({
+        success: true,
+        data: {
+          id: user._id,
+          fullName: user.fullName,
+          email: user.email,
+          phone: user.phone,
+          address: user.address,
+          role: user.role,
+        },
+      });
+    })
+    .catch(next);
+}
+
+export function changePassword(req, res, next) {
+  const { currentPassword, newPassword } = req.body;
+
+  User.findById(req.user._id)
+    .select("+password")
+    .then((user) => {
+      return bcrypt.compare(currentPassword, user.password).then((isMatch) => {
+        if (!isMatch) {
+          const error = new Error("Current password is incorrect");
+          error.statusCode = 401;
+          throw error;
+        }
+        return bcrypt.hash(newPassword, 10).then((hashedPassword) => {
+          user.password = hashedPassword;
+          user.passwordChangedAt = new Date(); // reuses the same session-invalidation logic from reset-password
+          return user.save();
+        });
+      });
+    })
+    .then(() => {
+      res.status(200).json({ success: true, message: "Password changed successfully" });
+    })
+    .catch(next);
+}

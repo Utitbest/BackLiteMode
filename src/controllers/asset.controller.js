@@ -9,7 +9,12 @@ function scopeFilter(user) {
 }
 
 export function getAssets(req, res, next) {
-  Asset.find(scopeFilter(req.user))
+  const isSuperAdmin = SUPER_ADMIN_ROLES.includes(req.user.role);
+  const filter = isSuperAdmin
+    ? (req.query.siteId ? { site: req.query.siteId } : {})
+    : { site: req.user.site };
+
+  Asset.find(filter)
     .populate("assignedProperty", "name")
     .sort({ createdAt: -1 })
     .then((assets) => res.status(200).json({ success: true, data: assets }))
