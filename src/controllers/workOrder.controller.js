@@ -70,7 +70,7 @@ export function createWorkOrder(req, res, next) {
   })
     .then((workOrder) => {
       if (sendSmsAlert && finalAssignedTo) {
-        // TODO: integrate an SMS provider (e.g. Termii) once ready
+        // TODO: integrate an SMS provider 
         console.log(`SMS alert would be sent for work order ${workOrder._id} to assignee ${finalAssignedTo}`);
       }
       res.status(201).json({ success: true, data: workOrder });
@@ -170,7 +170,6 @@ export function getAssignableUsers(req, res, next) {
   const isSuperAdmin = SUPER_ADMIN_ROLES.includes(req.user.role);
 
   if (isSuperAdmin && !req.query.siteId) {
-    // Don't return a jumbled cross-site pool — force a site to be picked first
     return res.status(200).json({ success: true, data: [] });
   }
 

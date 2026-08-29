@@ -54,7 +54,7 @@ export function getPendingLeaveRequests(req, res, next) {
 }
 
 export function reviewLeaveRequest(req, res, next) {
-  const { status, reviewNote } = req.body; // "approved" | "rejected"
+  const { status, reviewNote } = req.body; 
 
   LeaveRequest.findById(req.params.id)
     .then((request) => {
